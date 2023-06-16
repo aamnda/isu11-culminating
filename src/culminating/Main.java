@@ -6,6 +6,8 @@ package culminating;
 // score for 2 players is dependent on BOTH PLAYERS! both players 
 // must reach that score for it to be accumulated!
 
+
+// importations
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -31,6 +33,8 @@ public class Main extends JPanel implements KeyListener, Runnable {
                                  // 4 - In-Game
                                  // 5 - Pause
                                  // 6 - Game Over
+
+    // Sprite number variables
     public static int idleSpriteNo = 0;
     public static int runSpriteNo = 0;
     public static int waterSpriteNo = 0;
@@ -38,27 +42,33 @@ public class Main extends JPanel implements KeyListener, Runnable {
     public static int frameController = 0;
     public static int timer = 0;
 
+    // background
     public static int bgyPos = -700;
     public static int moveUpFactor = 1;
 
+    // land varaibles
     public static int landx;
     public static int landy;
     public static int[] landxCoords = new int[10];
     public static int[] landyCoords = { -150, -100, -50, 0, 50, 100, 150, 175, 200, 250 };
 
+    //water variable
     public static int wavey = 200;
 
+    // character platform indexs
     public static int dogPlatformIndex = -1;
     public static int catPlatformIndex = -1;
 
+    // collision variiables
     public static boolean dogOnPlatform = false;
     public static boolean catOnPlatform = false;
 
-    // Character Positions
+    // dog positions
     public static int dogxPos = 320;
     public static int dogyPos = 240;
     public static int dogyPosOld = 240;
 
+    // cat positions
     public static int catxPos = 360;
     public static int catyPos = 240;
     public static int catyPosOld = 240;
@@ -94,6 +104,7 @@ public class Main extends JPanel implements KeyListener, Runnable {
     public static boolean dogLookLeft = false;
     public static boolean catLookLeft = false;
 
+    // jumping variables
     public static int dogGravity = 3;
     public static int dogVelocity = -27;
     public static int catGravity = 3;
@@ -126,10 +137,13 @@ public class Main extends JPanel implements KeyListener, Runnable {
 
     public static BufferedImage arrow;
 
+    // import audio
     public static String music = "culminating/assets/music.wav";
     public static String gameOver = "culminating/assets/gameOver.wav";
     public static String soundEffect2 = "culminating/assets/soundEffect2.wav";
 
+
+    // method that gets the highscore through text file streaming
     public static int getNewHighScore(int score, String txtFileName) {
         try {
             Scanner inputFile = new Scanner(new File("culminating/" + txtFileName));
@@ -164,6 +178,7 @@ public class Main extends JPanel implements KeyListener, Runnable {
         t.start();
     }
 
+    // Graphics
     public void paintComponent(Graphics g) {
         super.paintComponent(g); // Clears the screen
         g.drawImage(stateImages[state], 0, 0, null);
@@ -220,12 +235,16 @@ public class Main extends JPanel implements KeyListener, Runnable {
                 g.drawImage(arrow, selectArrowxPos, selectArrowyPos, null);
         }
 
+        // inGame
         if (state == 4) {
 
             dogyPosOld = dogyPos;
             catyPosOld = catyPos;
 
             g.drawImage(stateImages[state], 0, bgyPos, null); // sky
+
+            // if dog or cat is on platform, the game will begin: the background 
+            // will start rising and so will the water.
 
             if (dogOnPlatform || catOnPlatform) {
                 if (bgyPos < 0) { // used to accumulate y pos of land and bg
@@ -284,6 +303,8 @@ public class Main extends JPanel implements KeyListener, Runnable {
                 frameController = 0;
             }
 
+            
+            // Generating new platforms
             for (int i = 0; i < 10; i++) {
                 if (landyCoords[i] > 360) { // generate new blocks if old one disappears
                     if (i % 2 == 0)
@@ -298,8 +319,10 @@ public class Main extends JPanel implements KeyListener, Runnable {
                 g.drawImage(land, landxCoords[i], landyCoords[i], null); // print platforms
             }
 
+            // display score
             g.drawString(Integer.toString(score), 20, 50);
 
+            // one player movement, collision detection and sprites
             if (!twoPlayers) {
                 // for movement
                 if (dogJumping || rightPressed || leftPressed) {
@@ -426,6 +449,7 @@ public class Main extends JPanel implements KeyListener, Runnable {
 
                 // if nothing is pressed
                 else {
+                    // idle animation
                     if (dogLookLeft)
                         g.drawImage(dogIdlel[idleSpriteNo], dogxPos, dogyPos, null);
                     else if (!dogLookLeft)
@@ -448,7 +472,7 @@ public class Main extends JPanel implements KeyListener, Runnable {
 
             }
 
-            // two players
+            // two players movement, collision detection and sprites
             else {
                 // for movement
                 if (dogJumping || rightPressed || leftPressed) {
@@ -697,6 +721,7 @@ public class Main extends JPanel implements KeyListener, Runnable {
                         g.drawImage(catIdle[idleSpriteNo], catxPos, catyPos, null);
                 }
 
+                // gaining score
                 if (dogyPos < dogyPosOld && dogyPos >= catyPos) {
                     score += dogyPosOld - dogyPos;
                     System.out.println(score);
@@ -715,6 +740,7 @@ public class Main extends JPanel implements KeyListener, Runnable {
             }
         }
 
+        // game over
         if (state == 6)
 
         {
@@ -750,6 +776,7 @@ public class Main extends JPanel implements KeyListener, Runnable {
             landyCoords[8] = 200;
             landyCoords[9] = 250;
 
+            // display score and highscore
             if (!twoPlayers) {
                 g.drawString("score: " + Integer.toString(score), 220, 150);
                 g.drawString("highscore: " + Integer.toString(getNewHighScore(score, "score1.txt")), 170, 180);
@@ -870,7 +897,8 @@ public class Main extends JPanel implements KeyListener, Runnable {
         }
 
         else if (state == 4) { // in-game
-            if (e.getKeyChar() == 'p') {
+
+            if (e.getKeyCode() == 27) {
                 state = 5; // pause
             } else if (e.getKeyChar() == 'g') {
                 // state = 6; // game over
